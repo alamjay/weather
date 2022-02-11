@@ -1,23 +1,34 @@
-import logo from './logo.svg';
+import axios from 'axios';
+import { useState } from 'react';
 import './App.css';
+import DisplayForecast from './components/DisplayForecast/DisplayForecast';
+import Search from './components/Search/Search';
 
 function App() {
+
+  const [weather, setWeather] = useState();
+  const [display, setDisplay] = useState(false);
+
+
+  // Fetch weather from the location id given by search
+  const getWeather = (location) => {
+    axios.get(`https://www.metaweather.com/api/location/${location.woeid}`)
+        .then((response) => {
+
+            // if result is ok 
+            if(response.status === 200) {
+              setWeather(response.data.consolidated_weather);
+              setDisplay(true);
+            }
+        })
+  }
+  
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+        <h1 className='mt-5'>Weather App</h1>
+        <Search onGetWeather={getWeather}  />
+        <DisplayForecast display={display} weather={weather} />
     </div>
   );
 }
