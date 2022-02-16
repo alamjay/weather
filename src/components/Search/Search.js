@@ -10,7 +10,7 @@ function Search(props) {
     const [inputValue, setInputValue] = useState('');
     const [displayValidation, setDisplayValidation] = useState(false);
     const [displayErrorMessage, setDisplayErrorMessage] = useState(false);
-    const [axiosGet, setAxiosGet] = useState(false);
+    const [locationSearch, setLocationSearch] = useState(false);
 
     const { readRemoteFile } = usePapaParse();    
 
@@ -24,21 +24,24 @@ function Search(props) {
         });
 
         const fetchLoc = async () => {
+            
             await axios.get(`https://www.metaweather.com/api/location/search/?query=${value}`)
             .then((response) => {
-                    props.onGetWeather(response.data[0]);                    
+                    props.onGetWeather(response.data[0]);  
+                    setLocationSearch(false);
             })
             .catch(err => {
                 setDisplayErrorMessage(true);
                 console.log(err);
             })
-            setAxiosGet(false); 
         }
-        
-        if(axiosGet && value) {
+
+        if(locationSearch === true) {
+            console.log(displayErrorMessage);
             fetchLoc();
         }
-    }, [axiosGet]);
+        
+    }, [locationSearch, displayErrorMessage]);
 
     // limit number of options to display
     const filterOptions = createFilterOptions({
@@ -46,20 +49,10 @@ function Search(props) {
       
     });
 
-    // get location from the input
-    function fetchLocation() {
-        
-    }
-
     // input validation
     const handleInputChange = (event, newValue) => {
         setInputValue(newValue);
-        
-        if(newValue.length === 0) {
-            setDisplayValidation(true);
-        } else {
-            setDisplayValidation(false);
-        }
+        newValue.length === 0 ? setDisplayValidation(true) : setDisplayValidation(false);
     } 
 
     return (
@@ -72,13 +65,14 @@ function Search(props) {
         filterOptions={filterOptions}
         value={value}
         onChange={(event, newValue) => {
-            setValue(newValue);
-
-            if(!null){ 
-                setAxiosGet(true);
-                setDisplayErrorMessage(false);
-            }
             
+            if(newValue !== null) {
+                if(displayErrorMessage){ 
+                    setDisplayErrorMessage(false);
+                }
+                setValue(newValue);
+                setLocationSearch(true);
+            }
         }}
         inputValue={inputValue}
         onInputChange={handleInputChange}
