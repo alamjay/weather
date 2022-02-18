@@ -18,7 +18,7 @@ const DisplayForecast = (props) => {
 
               // Loop through 5 day forecast
               props.weather.map((forecast, index) => {
-                return <WeatherCard key={index} index={index} forecast={forecast} />
+                index >= 5 && <WeatherCard key={index} index={index} forecast={forecast} /> 
               })
             } 
           </div>
